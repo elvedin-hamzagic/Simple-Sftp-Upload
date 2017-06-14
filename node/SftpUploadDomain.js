@@ -246,8 +246,14 @@
             return fullRemotePath;
         }
         
-			self.getLs = function(filepath,config){
-				self.ftpClient = null;
+			self.getLs = function(filepath,config,tg, folder){
+				self.isRunning = false;
+				if(self.ftpClient){
+					self.ftpClient.raw.quit(function(err){
+						console.log(err);
+					});
+					self.ftpClient = null;
+				}
 				self.ftpClient = new JSFtp({
 					port: config.port,
 					host: config.host,
@@ -255,7 +261,7 @@
 					pass: config.password
 				});
 				self.ftpClient.ls(filepath,function(err, res){
-					_domainManager.emitEvent("auSimpleSftpUpload", "getLs", [res]);
+					_domainManager.emitEvent("auSimpleSftpUpload", "getLs", [res,tg,folder]);
 				});
 			}
     }
@@ -280,8 +286,8 @@
     }
         
 	
-		function cmdGetLs(filepath, config) {
-			sftpJobs.getLs(filepath, config);
+		function cmdGetLs(filepath, config, tg, folder) {
+			sftpJobs.getLs(filepath, config, tg, folder);
 		}
 	
         
@@ -293,7 +299,7 @@
         }
         
 		 
-		domainManager.registerCommand("auSimpleSftpUpload", "getLs", cmdGetLs, false, "");
+		domainManager.registerCommand("auSimpleSftpUpload", "getLs", cmdGetLs, true, "");
 		 
         
         domainManager.registerCommand(

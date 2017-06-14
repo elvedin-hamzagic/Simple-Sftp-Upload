@@ -15,11 +15,13 @@ define(function(require, exports, module) {
 		 
 		 context							= {Strings: Strings, MyStrings: STRINGS},
 		 
+		 folderId						= 1,
+		 
 		 _nodeDomain;
 	
 	
 	/* getList ------------------------------------------------------------ */
-	function getList(accessPoint) {
+	function getList(accessPoint,folder,tg) {
 		
 		var serverConnectionSetting = {};
 		
@@ -47,8 +49,8 @@ define(function(require, exports, module) {
 				};
 			}
 			
-			_nodeDomain.exec("getLs", serverConnectionSetting.serverPath, serverConnectionSetting).done(function(){
-					
+			_nodeDomain.exec("getLs", serverConnectionSetting.serverPath+folder, serverConnectionSetting, tg, folder).done(function(){
+				
 			}).fail(function (err) {
 				console.error(err);
 			});
@@ -62,26 +64,25 @@ define(function(require, exports, module) {
 	/* setUploadEvent ------------------------------------------------------------ */
 	function setUploadEvent(){
 		
-		//<li class="jstree-closed"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;width:10px;"></div><ins class="jstree-icon"> </ins><span>_css</span></a></li>
-		//<li class="jstree-leaf"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;width:10px;"></div><ins class="jstree-icon"> </ins><span>index</span><span class="extension">.html</span></a></li>
-		
-		$(_nodeDomain).on('getLs', function(obj, res){
+		$(_nodeDomain).on('getLs', function(obj, res, tg, folder){
 			
-			var list = "";
+			console.log("getLs ev fire");
 			
-			//console.log(res);
+			var list = '<ul class="jstree-brackets jstree-no-dots jstree-no-icons" style="margin-left:10px;">';
 			
 			for (var i = 0; i < res.length; i++) {
 				if(res[i]["type"] == 1){
-					list += '<li class="jstree-closed jstree-folder" style="padding-left:10px"><ins class="jstree-icon"></ins><a href="#" class="" data-path="'+ res[i]["name"] + '/"><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>' + res[i]["name"] + '</span></a></li>';
+					list += '<li class="jstree-closed jstree-folder" style="padding-left:10px" id="fid_' + folderId + '" data-folder="'+ folder + res[i]["name"] + '/"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>' + res[i]["name"] + '</span></a></li>';
 				}else if(res[i]["type"] == 0){
 					var fname = res[i]["name"].split(/\.(?=[^.]+$)/);
 					list += '<li class="jstree-leaf"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>' + fname[0] + '</span><span class="extension">' + fname[1] + '</span></a></li>';
 				}
+				folderId++;
 			}
-			$dialog_server_manager.find(".modal-body ul").html(list);
+			list += '</ul>';
+			$(tg).append(list);
 			
-			setFolder($dialog_server_manager);
+			setFolder($(tg));
 			
 			function setFolder($tgs){
 				$tgs.find(".jstree-folder a, .jstree-folder ins").each(function(){
@@ -89,7 +90,7 @@ define(function(require, exports, module) {
 						if ( $(this).parent().hasClass("jstree-closed") ){
 							$(this).parent().removeClass("jstree-closed");
 							$(this).parent().addClass("jstree-open");
-							$(this).parent().append('<ul class="jstree-brackets jstree-no-dots jstree-no-icons" style="margin-left:10px;"><li class="jstree-closed jstree-folder" style="padding-left:10px"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>_notes</span></a></li><li class="jstree-closed jstree-folder" style="padding-left:10px"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>lib</span></a></li><li class="jstree-leaf"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>common</span><span class="extension">.js</span></a></li><li class="jstree-leaf"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span data-reactid=".0.4.$_js.2.$index=1js.1.2">index</span><span class="extension" data-reactid=".0.4.$_js.2.$index=1js.1.3">.js</span></a></li></ul>');
+							getList("test", $(this).parent().attr("data-folder"), "#"+$(this).parent().attr("id"));
 							setFolder($(this).parent());
 						}else{
 							$(this).parent().removeClass("jstree-open");
@@ -114,7 +115,8 @@ define(function(require, exports, module) {
 		var dl = Dialogs.showModalDialogUsingTemplate(Mustache.render(dialog_server_manager_tmp, context));
 		$dialog_server_manager = dl.getElement();
 		
-		getList("test");
+		$("#au-ssftp-server_manager_dialog .modal-body").find("ul").remove();
+		getList("test", "", "#au-ssftp-server_manager_dialog .modal-body");
 		
 		
 		
