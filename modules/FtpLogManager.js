@@ -4,6 +4,7 @@ define(function(require) {
 	var Strings							= brackets.getModule("strings"),
 		 CommandManager				= brackets.getModule("command/CommandManager"),
 		 PanelManager					= brackets.getModule("view/PanelManager"),
+		 Mustache						= brackets.getModule("thirdparty/mustache/mustache"),
 		
 		 STRINGS							= require("modules/Strings"),
 		 

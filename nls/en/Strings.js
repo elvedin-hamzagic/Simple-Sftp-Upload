@@ -36,7 +36,8 @@ define({
 	TXT_START_UPLOADING_Q_NOW:	"Running upload queue",
 	TXT_UPLOADING:	"Uploading ...",
 	TXT_UPLOADING_COMP:	"Upload complete",
-	TXT_UPLOADING_COMP_Q:	"Upload queue complete"
+	TXT_UPLOADING_COMP_Q:	"Upload queue complete",
+	TXT_REMOTE_SITE_VIEW:	"View remote site"
 	
 	
 	
