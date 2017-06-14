@@ -37,7 +37,8 @@ define({
 	TXT_UPLOADING:	"Uploading ...",
 	TXT_UPLOADING_COMP:	"Upload complete",
 	TXT_UPLOADING_COMP_Q:	"Upload queue complete",
-	TXT_REMOTE_SITE_VIEW:	"View remote site"
+	TXT_REMOTE_SITE_VIEW:	"View remote site",
+	TXT_CONNECTION_UPDATE:	"Connection / Update"
 	
 	
 	

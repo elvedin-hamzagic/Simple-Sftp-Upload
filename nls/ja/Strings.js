@@ -37,7 +37,8 @@ define({
 	TXT_UPLOADING:	"アップロード中 ...",
 	TXT_UPLOADING_COMP:	"アップロード完了",
 	TXT_UPLOADING_COMP_Q:	"アップロードキュー完了",
-	TXT_REMOTE_SITE_VIEW:	"リモートサイトの表示"
+	TXT_REMOTE_SITE_VIEW:	"リモートサイトの表示",
+	TXT_CONNECTION_UPDATE:	"接続／更新"
 	
 	
 });

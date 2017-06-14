@@ -61,21 +61,39 @@ define(function(require, exports, module) {
 	}
 	
 	
+	/* getChTsDate ------------------------------------------------------------ */
+	function getChTsDate(ts){
+		var _d = new Date(ts),
+			 d = _d.getFullYear() + "/" + ( _d.getMonth() + 1 ) + "/" + _d.getDate() + " " + _d.getHours() + ":" + _d.getMinutes();
+		return d;
+	}
+	
+	
+	/* getKByte ------------------------------------------------------------ */
+	function getKByte(bt){
+		return ( Math.floor(( bt * 0.001 ) * 10) / 10 ) + " kb";
+	}
+	
+	
 	/* setUploadEvent ------------------------------------------------------------ */
 	function setUploadEvent(){
 		
-		$(_nodeDomain).on('getLs', function(obj, res, tg, folder){
-			
-			console.log("getLs ev fire");
+		_nodeDomain.on('getLs', function(obj, res, tg, folder){
 			
 			var list = '<ul class="jstree-brackets jstree-no-dots jstree-no-icons" style="margin-left:10px;">';
 			
 			for (var i = 0; i < res.length; i++) {
 				if(res[i]["type"] == 1){
-					list += '<li class="jstree-closed jstree-folder" style="padding-left:10px" id="fid_' + folderId + '" data-folder="'+ folder + res[i]["name"] + '/"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>' + res[i]["name"] + '</span></a></li>';
+					list += '<li class="jstree-closed jstree-folder" style="padding-left:10px" id="fid_' + folderId + '" data-folder="'+ folder + res[i]["name"] + '/">';
+					list += '<ins class="jstree-icon"></ins>';
+					list += '<a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>' + res[i]["name"] + '</span><span class="date">' + getChTsDate(res[i]["time"]) + '</span></a>';
+					list += '</li>';
 				}else if(res[i]["type"] == 0){
 					var fname = res[i]["name"].split(/\.(?=[^.]+$)/);
-					list += '<li class="jstree-leaf"><ins class="jstree-icon"></ins><a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"> </ins><span>' + fname[0] + '</span><span class="extension">' + fname[1] + '</span></a></li>';
+					list += '<li class="jstree-leaf">';
+					list += '<ins class="jstree-icon"></ins>';
+					list += '<a href="#" class=""><div style="display:inline-block;"></div><ins class="jstree-icon"></ins><span>' + fname[0] + '</span><span class="extension">' + fname[1] + '</span><span class="date">' + getChTsDate(res[i]["time"]) + '</span><span class="size">' + getKByte(res[i]["size"]) + '</span></a>';
+					list += '</li>';
 				}
 				folderId++;
 			}
@@ -86,11 +104,11 @@ define(function(require, exports, module) {
 			
 			function setFolder($tgs){
 				$tgs.find(".jstree-folder a, .jstree-folder ins").each(function(){
-					$(this).on("click", function(){
+					$(this).click(function(){
 						if ( $(this).parent().hasClass("jstree-closed") ){
 							$(this).parent().removeClass("jstree-closed");
 							$(this).parent().addClass("jstree-open");
-							getList("test", $(this).parent().attr("data-folder"), "#"+$(this).parent().attr("id"));
+							getList($(this).closest(".tab-pane").attr("data-location"), $(this).parent().attr("data-folder"), "#"+$(this).parent().attr("id"));
 							setFolder($(this).parent());
 						}else{
 							$(this).parent().removeClass("jstree-open");
@@ -100,8 +118,6 @@ define(function(require, exports, module) {
 					});
 				});
 			}
-			
-			
 			
 		});
 		
@@ -115,9 +131,20 @@ define(function(require, exports, module) {
 		var dl = Dialogs.showModalDialogUsingTemplate(Mustache.render(dialog_server_manager_tmp, context));
 		$dialog_server_manager = dl.getElement();
 		
-		$("#au-ssftp-server_manager_dialog .modal-body").find("ul").remove();
-		getList("test", "", "#au-ssftp-server_manager_dialog .modal-body");
+		$dialog_server_manager.find(".nav-tabs a").click(function (e) {
+			e.preventDefault();
+			$(this).tab('show');
+		});
 		
+		$dialog_server_manager.find("#tab1 .btn-conection").click(function (e) {
+			$("#au-ssftp-server_manager_dialog #tab1 .jstree").find("ul").remove();
+			getList("test", "", "#au-ssftp-server_manager_dialog #tab1 .jstree");
+		});
+		
+		$dialog_server_manager.find("#tab2 .btn-conection").click(function (e) {
+			$("#au-ssftp-server_manager_dialog #tab2 .jstree").find("ul").remove();
+			getList("production", "", "#au-ssftp-server_manager_dialog #tab2 .jstree");
+		});
 		
 		
 		DRAG_AND_MOVE.drag_and_move(document.querySelector("#au-ssftp-server_manager_dialog"), { dragZone: ".modal-wrapper .modal-header", resizer: true });
