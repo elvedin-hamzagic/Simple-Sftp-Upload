@@ -246,23 +246,25 @@
             return fullRemotePath;
         }
         
-			self.getLs = function(filepath,config,tg, folder){
-				self.isRunning = false;
-				if(self.ftpClient){
-					self.ftpClient.raw.quit(function(err){
-						console.log(err);
+			self.getLs = function(filepath,config,tg,folder){
+				if(config.method == "ftp"){
+					self.isRunning = false;
+					if(self.ftpClient){
+						self.ftpClient.raw.quit(function(err){
+							console.log(err);
+						});
+						self.ftpClient = null;
+					}
+					self.ftpClient = new JSFtp({
+						port: config.port,
+						host: config.host,
+						user: config.username,
+						pass: config.password
 					});
-					self.ftpClient = null;
+					self.ftpClient.ls(filepath,function(err, res){
+						_domainManager.emitEvent("auSimpleSftpUpload", "getLs", [res,tg,folder]);
+					});
 				}
-				self.ftpClient = new JSFtp({
-					port: config.port,
-					host: config.host,
-					user: config.username,
-					pass: config.password
-				});
-				self.ftpClient.ls(filepath,function(err, res){
-					_domainManager.emitEvent("auSimpleSftpUpload", "getLs", [res,tg,folder]);
-				});
 			}
     }
     
